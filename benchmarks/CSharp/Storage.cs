@@ -1,38 +1,33 @@
 namespace Benchmarks;
 
-public class Storage : Benchmark
+internal sealed class Storage : Benchmark
 {
-  private int count;
+  private int _count;
 
   public override object Execute()
   {
-    Random random = new Random();
-    count = 0;
+    Random random = new();
+    _count = 0;
     BuildTreeDepth(7, random);
-    return count;
+    return _count;
   }
 
   private object BuildTreeDepth(int depth, Random random)
   {
-    count++;
+    _count++;
     if (depth == 1)
     {
       return new object[random.Next() % 10 + 1];
     }
-    else
+
+    object[] arr = new object[4];
+    for (int i = 0; i < 4; i++)
     {
-      object[] arr = new object[4];
-      for (int i = 0; i < 4; i++)
-      {
-        arr[i] = this.BuildTreeDepth(depth - 1, random);
-      }
-
-      return arr;
+      arr[i] = BuildTreeDepth(depth - 1, random);
     }
+
+    return arr;
   }
 
-  public override bool VerifyResult(object result)
-  {
-    return 5461 == (int) result;
-  }
+  public override bool VerifyResult(object result) => 5461 == (int)result;
 }

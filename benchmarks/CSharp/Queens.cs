@@ -1,33 +1,33 @@
 namespace Benchmarks;
 
-public class Queens : Benchmark
+internal class Queens : Benchmark
 {
-  private bool[] freeMaxs = Array.Empty<bool>();
-  private bool[] freeRows = Array.Empty<bool>();
-  private bool[] freeMins = Array.Empty<bool>();
-  private int[] queenRows = Array.Empty<int>();
+  private bool[] _freeMaxs = null!;
+  private bool[] _freeRows = null!;
+  private bool[] _freeMins = null!;
+  private int[] _queenRows = null!;
 
   public override object Execute()
   {
     bool result = true;
     for (int i = 0; i < 10; i++)
     {
-      result = result && _queens();
+      result = result && GenerateQueens();
     }
 
     return result;
   }
 
-  private bool _queens()
+  private bool GenerateQueens()
   {
-    freeRows = new bool[8];
-    Array.Fill(freeRows, true);
-    freeMaxs = new bool[16];
-    Array.Fill(freeMaxs, true);
-    freeMins = new bool[16];
-    Array.Fill(freeMins, true);
-    queenRows = new int[8];
-    Array.Fill(queenRows, -1);
+    _freeRows = new bool[8];
+    Array.Fill(_freeRows, true);
+    _freeMaxs = new bool[16];
+    Array.Fill(_freeMaxs, true);
+    _freeMins = new bool[16];
+    Array.Fill(_freeMins, true);
+    _queenRows = new int[8];
+    Array.Fill(_queenRows, -1);
 
     return PlaceQueen(0);
   }
@@ -38,7 +38,7 @@ public class Queens : Benchmark
     {
       if (GetRowColumn(r, c))
       {
-        queenRows[r] = c;
+        _queenRows[r] = c;
         SetRowColumn(r, c, false);
 
         if (c == 7)
@@ -58,20 +58,14 @@ public class Queens : Benchmark
     return false;
   }
 
-  private bool GetRowColumn(int r, int c)
-  {
-    return freeRows[r] && freeMaxs[c + r] && freeMins[c - r + 7];
-  }
+  private bool GetRowColumn(int r, int c) => _freeRows[r] && _freeMaxs[c + r] && _freeMins[c - r + 7];
 
   private void SetRowColumn(int r, int c, bool v)
   {
-    freeRows[r] = v;
-    freeMaxs[c + r] = v;
-    freeMins[c - r + 7] = v;
+    _freeRows[r] = v;
+    _freeMaxs[c + r] = v;
+    _freeMins[c - r + 7] = v;
   }
 
-  public override bool VerifyResult(object result)
-  {
-    return (bool) result;
-  }
+  public override bool VerifyResult(object result) => (bool)result;
 }

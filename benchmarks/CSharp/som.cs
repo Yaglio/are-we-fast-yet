@@ -1,119 +1,97 @@
 namespace Benchmarks;
 
-public static class CollectionConstants
+internal static class CollectionConstants
 {
   public const int InitialSize = 10;
 }
 
-public sealed class Pair<TK, TV>
+internal class Vector<TE>
 {
-  public TK Key { get; set; }
-  private TV Value { get; set; }
-
-  public Pair(TK key, TV value)
-  {
-    Key = key;
-    Value = value;
-  }
-}
-
-public delegate void ForEach<in TE>(TE elem);
-
-public delegate bool Test<in TE>(TE elem);
-
-public delegate T Collect<in TE, out T>(TE o);
-
-/**
- * Porting notes:
- *  - does not use an explicit array bounds check, because Java already does
- *    that. Don't see a point in doing it twice.
- */
-public class Vector<TE> where TE : class
-{
-  private TE[] storage;
-  private int firstIdx;
-  private int lastIdx;
+  private TE[]? _storage;
+  private int _firstIdx;
+  private int _lastIdx;
 
   public static Vector<TE> With(TE elem)
   {
-    Vector<TE> v = new Vector<TE>(1);
+    Vector<TE> v = new(1);
     v.Append(elem);
     return v;
   }
 
   public Vector(int size)
   {
-    storage = new TE[size];
+    _storage = size == 0 ? null : new TE[size];
   }
 
-  public Vector() : this(50)
+  public Vector()
   {
   }
 
   public TE? At(int idx)
   {
-    if (idx >= storage.Length)
+    if (_storage == null || idx >= _storage.Length)
     {
-      return default(TE);
+      return default;
     }
 
-    return storage[idx];
+    return _storage[idx];
   }
 
   public void AtPut(int idx, TE val)
   {
-    if (idx >= storage.Length)
+    if (_storage == null)
     {
-      int newLength = storage.Length;
+      _storage = new TE[Math.Max(idx + 1, CollectionConstants.InitialSize)];
+    }
+    else if (idx >= _storage.Length)
+    {
+      int newLength = _storage.Length;
       while (newLength <= idx)
       {
         newLength *= 2;
       }
 
-      TE[] newStorage = new TE[newLength];
-      storage.CopyTo(newStorage, 0);
-      storage = newStorage;
+      Array.Resize(ref _storage, newLength);
     }
 
-    storage[idx] = val;
-    if (lastIdx < idx + 1)
+    _storage[idx] = val;
+    if (_lastIdx < idx + 1)
     {
-      lastIdx = idx + 1;
+      _lastIdx = idx + 1;
     }
   }
 
   public void Append(TE elem)
   {
-    if (lastIdx >= storage.Length)
+    if (_storage == null)
+    {
+      _storage = new TE[CollectionConstants.InitialSize];
+    }
+    else if (_lastIdx >= _storage.Length)
     {
       // Need to expand capacity first
-      TE[] newStorage = new TE[2 * storage.Length];
-      storage.CopyTo(newStorage, 0);
-      storage = newStorage;
+      Array.Resize(ref _storage, 2 * _storage.Length);
     }
 
-    storage[lastIdx] = elem;
-    lastIdx++;
+    _storage[_lastIdx] = elem;
+    _lastIdx++;
   }
 
-  public bool IsEmpty()
-  {
-    return lastIdx == firstIdx;
-  }
+  public bool IsEmpty() => _lastIdx == _firstIdx;
 
-  public void ForEach(ForEach<TE> fn)
+  public void ForEach(Action<TE> fn)
   {
-    for (int i = firstIdx; i < lastIdx; i++)
+    for (int i = _firstIdx; i < _lastIdx; i++)
     {
-      fn.Invoke(storage[i]);
+      fn.Invoke(_storage![i]);
     }
   }
 
-  public bool HasSome(Test<TE> fn)
+  public bool HasSome(Predicate<TE> fn)
   {
-    for (int i = firstIdx; i < lastIdx; i++)
+    for (int i = _firstIdx; i < _lastIdx; i++)
     {
-      if (fn.Invoke(storage[i]))
+      if (fn.Invoke(_storage![i]))
       {
         return true;
       }
@@ -122,92 +100,86 @@ public class Vector<TE> where TE : class
     return false;
   }
 
-  public TE? GetOne(Test<TE> fn)
+  public TE? GetOne(Predicate<TE> fn)
   {
-    for (int i = firstIdx; i < lastIdx; i++)
+    for (int i = _firstIdx; i < _lastIdx; i++)
     {
-      TE e = storage[i];
+      TE e = _storage![i];
       if (fn.Invoke(e))
       {
         return e;
       }
     }
 
-    return default(TE);
+    return default;
   }
 
-  public TE? First()
-  {
-    if (IsEmpty())
-    {
-      return default(TE);
-    }
-
-    return storage[firstIdx];
-  }
+  public TE? First() => IsEmpty() ? default : _storage![_firstIdx];
 
   public TE? RemoveFirst()
   {
     if (IsEmpty())
     {
-      return default(TE);
+      return default;
     }
 
-    firstIdx++;
-    return storage[firstIdx - 1];
+    _firstIdx++;
+    return _storage![_firstIdx - 1];
   }
 
   public bool Remove(TE obj)
   {
+    if (_storage == null || IsEmpty())
+    {
+      return false;
+    }
+
     TE[] newArray = new TE[Capacity()];
-    int[] newLast = new int[] {0};
-    bool[] found = new bool[] {false};
+    int newLast = 0;
+    bool found = false;
 
     ForEach(it =>
     {
-      if (it == obj)
+      if (EqualityComparer<TE>.Default.Equals(it, obj))
       {
-        found[0] = true;
+        found = true;
       }
       else
       {
-        newArray[newLast[0]] = it;
-        newLast[0]++;
+        newArray[newLast] = it;
+        newLast++;
       }
     });
 
-    storage = newArray;
-    lastIdx = newLast[0];
-    firstIdx = 0;
-    return found[0];
+    _storage = newArray;
+    _lastIdx = newLast;
+    _firstIdx = 0;
+    return found;
   }
 
   public void RemoveAll()
   {
-    firstIdx = 0;
-    lastIdx = 0;
-    storage = new TE[storage.Length];
-  }
-
-  public int Size()
-  {
-    return lastIdx - firstIdx;
-  }
-
-  public int Capacity()
-  {
-    return storage.Length;
-  }
-
-  public void Sort(CompareTo<TE>? c)
-  {
-    if (Size() > 0)
+    _firstIdx = 0;
+    _lastIdx = 0;
+    if (_storage != null)
     {
-      Sort(firstIdx, lastIdx - 1, c);
+      _storage = new TE[_storage.Length];
     }
   }
 
-  private void Sort(int i, int j, CompareTo<TE>? c)
+  public int Size() => _lastIdx - _firstIdx;
+
+  public int Capacity() => _storage?.Length ?? 0;
+
+  public void Sort(Comparison<TE>? c)
+  {
+    if (Size() > 0)
+    {
+      Sort(_firstIdx, _lastIdx - 1, c);
+    }
+  }
+
+  private void Sort(int i, int j, Comparison<TE>? c)
   {
     if (c == null)
     {
@@ -220,33 +192,33 @@ public class Vector<TE> where TE : class
       return;
     }
 
-    TE di = storage[i];
-    TE dj = storage[j];
+    TE di = _storage![i];
+    TE dj = _storage[j];
 
     if (c!.Invoke(di, dj) > 0)
     {
-      Swap(storage, i, j);
-      TE tt = di;
+      Swap(_storage, i, j);
+      TE temp = di;
       di = dj;
-      dj = tt;
+      dj = temp;
     }
 
     if (n > 2)
     {
       int ij = (i + j) / 2;
-      TE dij = storage[ij];
+      TE dij = _storage[ij];
 
       if (c.Invoke(di, dij) <= 0)
       {
         if (c.Invoke(dij, dj) > 0)
         {
-          Swap(storage, j, ij);
+          Swap(_storage, j, ij);
           dij = dj;
         }
       }
       else
       {
-        Swap(storage, i, ij);
+        Swap(_storage, i, ij);
         dij = di;
       }
 
@@ -257,13 +229,13 @@ public class Vector<TE> where TE : class
 
         while (true)
         {
-          while (k <= l && c.Invoke(dij, storage[l]) <= 0)
+          while (k <= l && c.Invoke(dij, _storage[l]) <= 0)
           {
             l -= 1;
           }
 
           k += 1;
-          while (k <= l && c.Invoke(storage[k], dij) <= 0)
+          while (k <= l && c.Invoke(_storage[k], dij) <= 0)
           {
             k += 1;
           }
@@ -273,7 +245,7 @@ public class Vector<TE> where TE : class
             break;
           }
 
-          Swap(storage, k, l);
+          Swap(_storage, k, l);
         }
 
         Sort(i, l, c);
@@ -282,20 +254,14 @@ public class Vector<TE> where TE : class
     }
   }
 
-  private static void Swap(TE[] storage2, int i, int j)
-  {
-    throw new NotImplementedException();
-  }
+  private static void Swap(TE[] storage2, int i, int j) => throw new NotImplementedException();
 
-  private void DefaultSort(int i, int j)
-  {
-    throw new NotImplementedException();
-  }
+  private void DefaultSort(int i, int j) => throw new NotImplementedException();
 }
 
-public class Set<TE> where TE : class
+internal class Set<TE>
 {
-  private readonly Vector<TE> items;
+  private readonly Vector<TE> _items;
 
   public Set() : this(CollectionConstants.InitialSize)
   {
@@ -303,57 +269,39 @@ public class Set<TE> where TE : class
 
   public Set(int size)
   {
-    items = new Vector<TE>(size);
+    _items = new Vector<TE>(size);
   }
 
-  public int Size()
-  {
-    return items.Size();
-  }
+  public int Size() => _items.Size();
 
-  public void ForEach(ForEach<TE> fn)
-  {
-    items.ForEach(fn);
-  }
+  public void ForEach(Action<TE> fn) => _items.ForEach(fn);
 
-  public bool HasSome(Test<TE> fn)
-  {
-    return items.HasSome(fn);
-  }
+  public bool HasSome(Predicate<TE> fn) => _items.HasSome(fn);
 
-  public TE? GetOne(Test<TE> fn)
-  {
-    return items.GetOne(fn);
-  }
+  public TE? GetOne(Predicate<TE> fn) => _items.GetOne(fn);
 
   public void Add(TE obj)
   {
     if (!Contains(obj))
     {
-      items.Append(obj);
+      _items.Append(obj);
     }
   }
 
-  public Vector<T> Collect<T>(Collect<TE, T> fn) where T : class
+  public Vector<T> Collect<T>(Func<TE, T> fn) where T : class
   {
-    Vector<T> coll = new Vector<T>();
+    Vector<T> coll = new();
 
     ForEach(e => coll.Append(fn.Invoke(e)));
     return coll;
   }
 
-  public virtual bool Contains(TE obj)
-  {
-    return HasSome(e => e.Equals(obj));
-  }
+  public virtual bool Contains(TE obj) => HasSome(e => e!.Equals(obj));
 
-  public void RemoveAll()
-  {
-    items.RemoveAll();
-  }
+  public void RemoveAll() => _items.RemoveAll();
 }
 
-public sealed class IdentitySet<TE> : Set<TE> where TE : class
+internal sealed class IdentitySet<TE> : Set<TE> where TE : class
 {
   public IdentitySet()
   {
@@ -363,37 +311,27 @@ public sealed class IdentitySet<TE> : Set<TE> where TE : class
   {
   }
 
-  public override bool Contains(TE obj)
-  {
-    return HasSome(e => e == obj);
-  }
+  public override bool Contains(TE obj) => HasSome(e => e == obj);
 }
 
-public interface ICompareTo<TV>
-{
-  int CompareTo(in TV v);
-}
-
-public delegate int CompareTo<in TE>(TE a, TE b);
-
-public interface ICustomHash
+internal interface ICustomHash
 {
   int CustomHash();
 }
 
-public class Dictionary<TK, TV> where TK : class, ICustomHash where TV : class
+internal class Dictionary<TK, TV> where TK : class, ICustomHash
 {
   protected const int InitialCapacity = 16;
 
-  private Entry?[] buckets;
-  private int size;
+  private Entry?[] _buckets;
+  private int _size;
 
   protected class Entry
   {
-    public int Hash { get; }
-    public TK Key { get; }
-    public TV Value { get; set; }
-    public Entry? Next { get; set; }
+    public readonly int Hash;
+    public readonly TK Key;
+    public TV Value;
+    public Entry? Next;
 
     public Entry(int hash, TK key, TV value, Entry? next)
     {
@@ -403,22 +341,19 @@ public class Dictionary<TK, TV> where TK : class, ICustomHash where TV : class
       Next = next;
     }
 
-    public virtual bool Match(int hash, TK key)
-    {
-      return Hash == hash && key.Equals(Key);
-    }
+    public virtual bool Match(int hash, TK key) => Hash == hash && key.Equals(Key);
   }
 
   public Dictionary(int size)
   {
-    this.buckets = new Entry[size];
+    _buckets = new Entry[size];
   }
 
   public Dictionary() : this(InitialCapacity)
   {
   }
 
-  private static int CalculateHash(TK key)
+  private static int CalculateHash(TK? key)
   {
     if (key == null)
     {
@@ -426,28 +361,16 @@ public class Dictionary<TK, TV> where TK : class, ICustomHash where TV : class
     }
 
     int hash = key.CustomHash();
-    return hash ^ hash >> 16;
+    return hash ^ (hash >>> 16);
   }
 
-  public virtual int Size()
-  {
-    return size;
-  }
+  public virtual int Size() => _size;
 
-  public bool IsEmpty()
-  {
-    return size == 0;
-  }
+  public bool IsEmpty() => _size == 0;
 
-  private int GetBucketIdx(int hash)
-  {
-    return (buckets.Length - 1) & hash;
-  }
+  private int GetBucketIdx(int hash) => (_buckets.Length - 1) & hash;
 
-  private Entry? GetBucket(int hash)
-  {
-    return buckets[GetBucketIdx(hash)];
-  }
+  private Entry? GetBucket(int hash) => _buckets[GetBucketIdx(hash)];
 
   public TV? At(TK key)
   {
@@ -464,7 +387,7 @@ public class Dictionary<TK, TV> where TK : class, ICustomHash where TV : class
       e = e.Next;
     }
 
-    return default(TV);
+    return default;
   }
 
   public bool ContainsKey(TK key)
@@ -490,28 +413,25 @@ public class Dictionary<TK, TV> where TK : class, ICustomHash where TV : class
     int hash = CalculateHash(key);
     int i = GetBucketIdx(hash);
 
-    Entry? current = buckets[i];
+    Entry? current = _buckets[i];
 
     if (current == null)
     {
-      buckets[i] = NewEntry(key, value, hash);
-      size += 1;
+      _buckets[i] = NewEntry(key, value, hash);
+      _size += 1;
     }
     else
     {
       InsertBucketEntry(key, value, hash, current);
     }
 
-    if (size > buckets.Length)
+    if (_size > _buckets.Length)
     {
       Resize();
     }
   }
 
-  protected virtual Entry NewEntry(TK key, TV value, int hash)
-  {
-    return new Entry(hash, key, value, null);
-  }
+  protected virtual Entry NewEntry(TK key, TV value, int hash) => new(hash, key, value, null);
 
   private void InsertBucketEntry(TK key, TV value, int hash, Entry head)
   {
@@ -527,7 +447,7 @@ public class Dictionary<TK, TV> where TK : class, ICustomHash where TV : class
 
       if (current.Next == null)
       {
-        size += 1;
+        _size++;
         current.Next = NewEntry(key, value, hash);
         return;
       }
@@ -538,10 +458,10 @@ public class Dictionary<TK, TV> where TK : class, ICustomHash where TV : class
 
   private void Resize()
   {
-    Entry?[] oldStorage = buckets;
+    Entry?[] oldStorage = _buckets;
 
     Entry?[] newStorage = new Entry?[oldStorage.Length * 2];
-    buckets = newStorage;
+    _buckets = newStorage;
     TransferEntries(oldStorage);
   }
 
@@ -556,7 +476,7 @@ public class Dictionary<TK, TV> where TK : class, ICustomHash where TV : class
 
         if (current.Next == null)
         {
-          buckets[current.Hash & (buckets.Length - 1)] = current;
+          _buckets[current.Hash & (_buckets.Length - 1)] = current;
         }
         else
         {
@@ -609,26 +529,26 @@ public class Dictionary<TK, TV> where TK : class, ICustomHash where TV : class
     if (loTail != null)
     {
       loTail.Next = null;
-      buckets[i] = loHead;
+      _buckets[i] = loHead;
     }
 
     if (hiTail != null)
     {
       hiTail.Next = null;
-      buckets[i + oldStorage.Length] = hiHead;
+      _buckets[i + oldStorage.Length] = hiHead;
     }
   }
 
   public void RemoveAll()
   {
-    buckets = new Entry[buckets.Length];
-    size = 0;
+    _buckets = new Entry[_buckets.Length];
+    _size = 0;
   }
 
   public Vector<TK> GetKeys()
   {
-    Vector<TK> keys = new Vector<TK>(size);
-    foreach (Entry? c in buckets)
+    Vector<TK> keys = new(_size);
+    foreach (Entry? c in _buckets)
     {
       Entry? current = c;
       while (current != null)
@@ -643,8 +563,8 @@ public class Dictionary<TK, TV> where TK : class, ICustomHash where TV : class
 
   public Vector<TV> GetValues()
   {
-    Vector<TV> values = new Vector<TV>(size);
-    foreach (Entry? c in buckets)
+    Vector<TV> values = new(_size);
+    foreach (Entry? c in _buckets)
     {
       Entry? current = c;
       while (current != null)
@@ -658,7 +578,7 @@ public class Dictionary<TK, TV> where TK : class, ICustomHash where TV : class
   }
 }
 
-public class IdentityDictionary<TK, TV> : Dictionary<TK, TV> where TK : class, ICustomHash where TV : class
+internal class IdentityDictionary<TK, TV> : Dictionary<TK, TV> where TK : class, ICustomHash
 {
   private sealed class IdEntry : Entry
   {
@@ -666,10 +586,7 @@ public class IdentityDictionary<TK, TV> : Dictionary<TK, TV> where TK : class, I
     {
     }
 
-    public override bool Match(int hash, TK key)
-    {
-      return Hash == hash && Key == key;
-    }
+    public override bool Match(int hash, TK key) => Hash == hash && Key == key;
   }
 
   public IdentityDictionary(int size) : base(size)
@@ -680,19 +597,28 @@ public class IdentityDictionary<TK, TV> : Dictionary<TK, TV> where TK : class, I
   {
   }
 
-  protected override Entry NewEntry(TK key, TV value, int hash)
-  {
-    return new IdEntry(hash, key, value, null);
-  }
+  protected override Entry NewEntry(TK key, TV value, int hash) => new IdEntry(hash, key, value, null);
 }
 
-public class Random
+internal class Random
 {
-  private int seed = 74755;
+  private int _seed = 74755;
 
   public int Next()
   {
-    seed = ((seed * 1309) + 13849) & 65535;
-    return seed;
+    _seed = (_seed * 1309 + 13849) & 65535;
+    return _seed;
+  }
+}
+
+internal sealed class Pair<TK, TV>
+{
+  public TK Key { get; set; }
+  private TV Value { get; set; }
+
+  public Pair(TK key, TV value)
+  {
+    Key = key;
+    Value = value;
   }
 }

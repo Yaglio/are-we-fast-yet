@@ -1,6 +1,6 @@
 namespace Benchmarks;
 
-public abstract class Benchmark
+internal abstract class Benchmark
 {
   public abstract object Execute();
   public abstract bool VerifyResult(object result);

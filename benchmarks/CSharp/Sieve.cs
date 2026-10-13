@@ -1,15 +1,15 @@
 namespace Benchmarks;
 
-public class Sieve : Benchmark
+internal class Sieve : Benchmark
 {
   public override object Execute()
   {
     bool[] flags = new bool[5000];
     Array.Fill(flags, true);
-    return sieve(flags, 5000);
+    return RunSieve(flags, 5000);
   }
 
-  int sieve(bool[] flags, int size)
+  private int RunSieve(bool[] flags, int size)
   {
     int primeCount = 0;
 
@@ -30,8 +30,5 @@ public class Sieve : Benchmark
     return primeCount;
   }
 
-  public override bool VerifyResult(object result)
-  {
-    return 669 == (int) result;
-  }
+  public override bool VerifyResult(object result) => 669 == (int)result;
 }

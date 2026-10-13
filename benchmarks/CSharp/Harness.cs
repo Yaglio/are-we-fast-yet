@@ -1,43 +1,24 @@
 namespace Benchmarks;
 
-public static class Harness
+internal sealed class Harness
 {
-  public static void Main(string[] args)
+  private static Run ProcessArguments(string[] args)
   {
-    if (args.Length == 0)
+    Run run = new(args[0]);
+
+    if (args.Length > 1)
     {
-      PrintHelp();
-      return;
+      run.SetIterations(int.Parse(args[1]));
+      if (args.Length > 2)
+      {
+        run.SetInnerIterations(int.Parse(args[2]));
+      }
     }
 
-    var benchmarkName = args[0];
-    var numberOfIterations = ArgumentOrDefault(1, 1);
-    var numberOfInnerIterations = ArgumentOrDefault(2, 1);
-
-    var benchmarkInstance = CreateBenchmarkInstance(benchmarkName);
-    if (benchmarkInstance == null)
-    {
-      PrintHelp();
-      Console.WriteLine();
-      Console.WriteLine($"Error: Benchmark \"{benchmarkName}\" was not found.");
-      Console.WriteLine("Known benchmarks:");
-      foreach (var known in KnownBenchmarks.Keys.OrderBy(x => x))
-        Console.WriteLine(known);
-      return;
-    }
-
-    var run = new Run(benchmarkInstance.GetType().Name);
-    run.SetIterations(numberOfIterations);
-    run.SetInnerIterations(numberOfInnerIterations);
-    run.RunBenchmark(benchmarkInstance);
-
-    int ArgumentOrDefault(int index, int defaultValue)
-    {
-      return args.Length > index ? int.Parse(args[index]) : defaultValue;
-    }
+    return run;
   }
 
-  private static void PrintHelp()
+  private static void PrintUsage()
   {
     Console.WriteLine("Harness [benchmark] [num-iterations [inner-iter]]");
     Console.WriteLine();
@@ -47,31 +28,16 @@ public static class Harness
     Console.WriteLine("                   which is measured in total, default: 1");
   }
 
-  private static readonly System.Collections.Generic.Dictionary<string, Type> KnownBenchmarks =
-    new(StringComparer.InvariantCultureIgnoreCase)
-    {
-      {nameof(Bounce), typeof(Bounce)},
-      {nameof(CD), typeof(CD)},
-      {nameof(DeltaBlue), typeof(DeltaBlue)},
-      {nameof(Havlak), typeof(Havlak)},
-      {nameof(Json), typeof(Json)},
-      {nameof(List), typeof(List)},
-      {nameof(Mandelbrot), typeof(Mandelbrot)},
-      {nameof(NBody), typeof(NBody)},
-      {nameof(Permute), typeof(Permute)},
-      {nameof(Queens), typeof(Queens)},
-      {nameof(Richards), typeof(Richards)},
-      {nameof(Sieve), typeof(Sieve)},
-      {nameof(Storage), typeof(Storage)},
-      {nameof(Towers), typeof(Towers)},
-    };
-
-  private static Benchmark? CreateBenchmarkInstance(string name)
+  public static void Main(string[] args)
   {
-    KnownBenchmarks.TryGetValue(name, out var benchmarkClass);
-    if (benchmarkClass == null)
-      return null;
-    var benchmarkInstance = Activator.CreateInstance(benchmarkClass) as Benchmark;
-    return benchmarkInstance;
+    if (args.Length < 1)
+    {
+      PrintUsage();
+      Environment.Exit(1);
+    }
+
+    Run run = ProcessArguments(args);
+    run.RunBenchmark();
+    run.PrintTotal();
   }
 }

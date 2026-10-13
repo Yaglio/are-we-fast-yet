@@ -1,6 +1,6 @@
 namespace Benchmarks;
 
-public sealed class List : Benchmark
+internal sealed class List : Benchmark
 {
   private sealed class Element
   {
@@ -19,10 +19,8 @@ public sealed class List : Benchmark
       {
         return 1;
       }
-      else
-      {
-        return 1 + Next.Length();
-      }
+
+      return 1 + Next.Length();
     }
   }
 
@@ -38,12 +36,9 @@ public sealed class List : Benchmark
     {
       return null;
     }
-    else
-    {
-      Element e = new Element(length);
-      e.Next = MakeList(length - 1);
-      return e;
-    }
+
+    Element e = new(length) { Next = MakeList(length - 1) };
+    return e;
   }
 
   private bool IsShorterThan(Element? x, Element? y)
@@ -71,14 +66,9 @@ public sealed class List : Benchmark
     {
       return Tail(Tail(x?.Next, y, z), Tail(y?.Next, z, x), Tail(z?.Next, x, y));
     }
-    else
-    {
-      return z;
-    }
+
+    return z;
   }
 
-  public override bool VerifyResult(object result)
-  {
-    return 10 == (int) result;
-  }
+  public override bool VerifyResult(object result) => 10 == (int)result;
 }

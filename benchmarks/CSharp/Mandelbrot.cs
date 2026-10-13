@@ -1,13 +1,14 @@
 namespace Benchmarks;
 
-public sealed class Mandelbrot : Benchmark
+internal sealed class Mandelbrot : Benchmark
 {
-  public override bool InnerBenchmarkLoop(int innerIterations)
-  {
-    return VerifyResult(_mandelbrot(innerIterations), innerIterations);
-  }
+  public override bool InnerBenchmarkLoop(int innerIterations) => VerifyResult(CalculateMandelbrot(innerIterations), innerIterations);
 
-  private static bool VerifyResult(int result, int innerIterations)
+  public override object Execute() => throw new InvalidOperationException("Execute should not be called for Mandelbrot benchmark.");
+
+  public override bool VerifyResult(object result) => throw new InvalidOperationException("VerifyResult(object) should not be called for Mandelbrot benchmark.");
+
+  private bool VerifyResult(int result, int innerIterations)
   {
     if (innerIterations == 500)
     {
@@ -24,22 +25,12 @@ public sealed class Mandelbrot : Benchmark
       return result == 128;
     }
 
-    Console.WriteLine("No verification result for " + innerIterations + " found");
-    Console.WriteLine("Result is: " + result);
+    Console.WriteLine($"No verification result for {innerIterations} found");
+    Console.WriteLine($"Result is: {result}");
     return false;
   }
 
-  public override object Execute()
-  {
-    throw new NotImplementedException();
-  }
-
-  public override bool VerifyResult(object result)
-  {
-    throw new NotImplementedException();
-  }
-
-  private int _mandelbrot(int size)
+  private int CalculateMandelbrot(int size)
   {
     int sum = 0;
     int byteAcc = 0;
@@ -49,7 +40,7 @@ public sealed class Mandelbrot : Benchmark
 
     while (y < size)
     {
-      double ci = (2.0 * y / size) - 1.0;
+      double ci = 2.0 * y / size - 1.0;
       int x = 0;
 
       while (x < size)
@@ -57,7 +48,7 @@ public sealed class Mandelbrot : Benchmark
         double zrzr = 0.0;
         double zi = 0.0;
         double zizi = 0.0;
-        double cr = (2.0 * x / size) - 1.5;
+        double cr = 2.0 * x / size - 1.5;
 
         int z = 0;
         bool notDone = true;
@@ -93,7 +84,7 @@ public sealed class Mandelbrot : Benchmark
         }
         else if (x == size - 1)
         {
-          byteAcc <<= (8 - bitNum);
+          byteAcc <<= 8 - bitNum;
           sum ^= byteAcc;
           byteAcc = 0;
           bitNum = 0;

@@ -1,43 +1,42 @@
 namespace Benchmarks;
 
-public sealed class TowersDisk
+internal sealed class Towers : Benchmark
 {
-  public int Size { get; }
-  public TowersDisk? Next { get; set; }
-
-  public TowersDisk(int size)
+  private sealed class TowersDisk
   {
-    this.Size = size;
-    this.Next = null;
-  }
-}
+    public int Size { get; }
+    public TowersDisk? Next { get; set; }
 
-public class Towers : Benchmark
-{
-  private TowersDisk?[] piles = Array.Empty<TowersDisk>();
-  private int movesDone;
+    public TowersDisk(int size)
+    {
+      Size = size;
+    }
+  }
+
+  private TowersDisk?[] _piles = null!;
+  private int _movesDone;
 
   private void PushDisk(TowersDisk disk, int pile)
   {
-    TowersDisk? top = piles[pile];
-    if (!(top == null) && (disk.Size >= top.Size))
+    TowersDisk? top = _piles[pile];
+    if (top != null && disk.Size >= top.Size)
     {
       throw new InvalidOperationException("Cannot put a big disk on a smaller one");
     }
 
     disk.Next = top;
-    piles[pile] = disk;
+    _piles[pile] = disk;
   }
 
   private TowersDisk PopDiskFrom(int pile)
   {
-    TowersDisk? top = piles[pile];
+    TowersDisk? top = _piles[pile];
     if (top == null)
     {
       throw new InvalidOperationException("Attempting to remove a disk from an empty pile");
     }
 
-    piles[pile] = top.Next;
+    _piles[pile] = top.Next;
     top.Next = null;
     return top;
   }
@@ -45,7 +44,7 @@ public class Towers : Benchmark
   private void MoveTopDisk(int fromPile, int toPile)
   {
     PushDisk(PopDiskFrom(fromPile), toPile);
-    movesDone++;
+    _movesDone++;
   }
 
   private void BuildTowerAt(int pile, int disks)
@@ -64,7 +63,7 @@ public class Towers : Benchmark
     }
     else
     {
-      int otherPile = (3 - fromPile) - toPile;
+      int otherPile = 3 - fromPile - toPile;
       MoveDisks(disks - 1, fromPile, otherPile);
       MoveTopDisk(fromPile, toPile);
       MoveDisks(disks - 1, otherPile, toPile);
@@ -73,15 +72,12 @@ public class Towers : Benchmark
 
   public override object Execute()
   {
-    piles = new TowersDisk[3];
+    _piles = new TowersDisk[3];
     BuildTowerAt(0, 13);
-    movesDone = 0;
+    _movesDone = 0;
     MoveDisks(13, 0, 1);
-    return movesDone;
+    return _movesDone;
   }
 
-  public override bool VerifyResult(object result)
-  {
-    return 8191 == (int) result;
-  }
+  public override bool VerifyResult(object result) => 8191 == (int)result;
 }
