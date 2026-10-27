@@ -81,14 +81,6 @@ internal sealed class JsonArray : JsonValue
     /// <returns>the number of elements in this array</returns>
     public int Size() => _values.Size();
 
-    /// <summary>
-    /// Returns the value of the element at the specified position in this array.
-    /// </summary>
-    /// <param name="index">the index of the array element to return</param>
-    /// <returns>the value of the element at the specified position</returns>
-    /// <exception cref="IndexOutOfRangeException">if the index is out of range, i.e. <c>index &lt; 0</c> or <c>index &gt;= size</c></exception>
-    public JsonValue? Get(int index) => _values.At(index);
-
     public override bool IsArray() => true;
 
     public override JsonArray AsArray() => this;
@@ -101,27 +93,13 @@ internal sealed class JsonLiteral : JsonValue
     public static readonly JsonValue False = new JsonLiteral("false");
 
     private readonly string _value;
-    private readonly bool _isNull;
-    private readonly bool _isTrue;
-    private readonly bool _isFalse;
 
     public JsonLiteral(string value)
     {
         _value = value;
-        _isNull = value == "null";
-        _isTrue = value == "true";
-        _isFalse = value == "false";
     }
 
     public override string ToString() => _value;
-
-    public override bool IsNull() => _isNull;
-
-    public override bool IsTrue() => _isTrue;
-
-    public override bool IsFalse() => _isFalse;
-
-    public override bool IsBool() => _isTrue || _isFalse;
 }
 
 internal sealed class JsonNumber : JsonValue
@@ -224,18 +202,6 @@ internal sealed class JsonObject : JsonValue
         int index = IndexOf(name);
         return index == -1 ? null : _values.At(index);
     }
-
-    /// <summary>
-    /// Returns the number of members (name/value pairs) in this object.
-    /// </summary>
-    /// <returns>the number of members in this object</returns>
-    public int Size() => _names.Size();
-
-    /// <summary>
-    /// Returns <c>true</c> if this object contains no members.
-    /// </summary>
-    /// <returns><c>true</c> if this object contains no members</returns>
-    public bool IsEmpty() => _names.IsEmpty();
 
     public override bool IsObject() => true;
 
@@ -758,30 +724,6 @@ internal abstract class JsonValue
     /// </summary>
     /// <returns><c>true</c> if this value represents a JSON string</returns>
     public virtual bool IsString() => false;
-
-    /// <summary>
-    /// Detects whether this value represents a bool value.
-    /// </summary>
-    /// <returns><c>true</c> if this value represents either the JSON literal <c>true</c> or <c>false</c></returns>
-    public virtual bool IsBool() => false;
-
-    /// <summary>
-    /// Detects whether this value represents the JSON literal <c>true</c>.
-    /// </summary>
-    /// <returns><c>true</c> if this value represents the JSON literal <c>true</c></returns>
-    public virtual bool IsTrue() => false;
-
-    /// <summary>
-    /// Detects whether this value represents the JSON literal <c>false</c>.
-    /// </summary>
-    /// <returns><c>true</c> if this value represents the JSON literal <c>false</c></returns>
-    public virtual bool IsFalse() => false;
-
-    /// <summary>
-    /// Detects whether this value represents the JSON literal <c>null</c>.
-    /// </summary>
-    /// <returns><c>true</c> if this value represents the JSON literal <c>null</c></returns>
-    public virtual bool IsNull() => false;
 
     /// <summary>
     /// Returns this JSON value as <see cref="JsonObject"/>, assuming that this value represents a JSON

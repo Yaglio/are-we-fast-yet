@@ -181,3 +181,25 @@ resharper_comment_typo_highlighting = none
 resharper_grammar_mistake_in_comment_highlighting = none
 resharper_grammar_mistake_in_string_literal_highlighting = none
 resharper_grammar_mistake_in_markup_attribute_highlighting = none
+
+
+# ==========================================
+# 8. FILE-SPECIFIC OVERRIDES
+# ==========================================
+[CD.cs]
+resharper_unused_method_return_value_local_highlighting = none
+
+[Havlak.cs]
+resharper_unused_member_local_highlighting = none
+resharper_collection_never_queried_local_highlighting = none
+resharper_not_accessed_field_local_highlighting = none
+
+[Json.cs]
+resharper_unused_method_return_value_local_highlighting = none
+resharper_not_accessed_field_local_highlighting = none
+
+[List.cs]
+resharper_unused_auto_property_accessor_local_highlighting = none
+
+[Vector.cs]
+resharper_unused_parameter_local_highlighting = none

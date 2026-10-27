@@ -100,22 +100,6 @@ internal class Vector<TE>
         return false;
     }
 
-    public TE? GetOne(Predicate<TE> fn)
-    {
-        for (int i = _firstIdx; i < _lastIdx; i++)
-        {
-            TE e = _storage![i];
-            if (fn.Invoke(e))
-            {
-                return e;
-            }
-        }
-
-        return default;
-    }
-
-    public TE? First() => IsEmpty() ? default : _storage![_firstIdx];
-
     public TE? RemoveFirst()
     {
         if (IsEmpty())

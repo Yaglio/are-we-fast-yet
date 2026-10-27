@@ -154,7 +154,7 @@ internal abstract class BinaryConstraint : AbstractConstraint
     protected Variable? V2; // possible output variables
     protected Direction? CurrentDirection; // one of the following...
 
-    protected BinaryConstraint(Variable var1, Variable var2, Strength.Sym strength, Planner planner) : base(strength)
+    protected BinaryConstraint(Variable var1, Variable var2, Strength.Sym strength) : base(strength)
     {
         V1 = var1;
         V2 = var2;
@@ -309,7 +309,7 @@ internal sealed class EqualityConstraint : BinaryConstraint
     // Install a constraint with the given strength equating the given
     // variables.
     public EqualityConstraint(Variable var1, Variable var2,
-        Strength.Sym strength, Planner planner) : base(var1, var2, strength, planner)
+        Strength.Sym strength, Planner planner) : base(var1, var2, strength)
     {
         AddConstraint(planner);
     }
@@ -449,19 +449,6 @@ internal sealed class Planner
         }
 
         return plan;
-    }
-
-    public void PropagateFrom(Variable v)
-    {
-        Vector<AbstractConstraint> todo = new();
-        AddConstraintsConsumingTo(v, todo);
-
-        while (!todo.IsEmpty())
-        {
-            AbstractConstraint? c = todo.RemoveFirst();
-            c!.Execute();
-            AddConstraintsConsumingTo(c.GetOutput()!, todo);
-        }
     }
 
     private void AddConstraintsConsumingTo(Variable v, Vector<AbstractConstraint> coll)
@@ -697,7 +684,7 @@ internal sealed class ScaleConstraint : BinaryConstraint
 
     public ScaleConstraint(Variable src, Variable scale,
         Variable offset, Variable dest, Strength.Sym strength,
-        Planner planner) : base(src, dest, strength, planner)
+        Planner planner) : base(src, dest, strength)
     {
         _scale = scale;
         _offset = offset;
@@ -829,11 +816,8 @@ internal sealed class Strength
 
     public int ArithmeticValue { get; }
 
-    private readonly Sym _symbolicValue;
-
     private Strength(Sym symbolicValue)
     {
-        _symbolicValue = symbolicValue;
         ArithmeticValue = _strengthTable.At(symbolicValue);
     }
 
@@ -842,8 +826,6 @@ internal sealed class Strength
     public bool Stronger(Strength s) => ArithmeticValue < s.ArithmeticValue;
 
     public bool Weaker(Strength s) => ArithmeticValue > s.ArithmeticValue;
-
-    public Strength Strongest(Strength s) => s.Stronger(this) ? s : this;
 
     public Strength Weakest(Strength s) => s.Weaker(this) ? s : this;
 

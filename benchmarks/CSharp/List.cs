@@ -6,7 +6,7 @@ internal sealed class List : Benchmark
     {
         public object Val { get; set; }
 
-        public Element? Next { get; set; }
+        public Element? Next { get; init; }
 
         public Element(object v)
         {

@@ -45,10 +45,6 @@ internal class Dictionary<TK, TV> where TK : class, ICustomHash
         return hash ^ (hash >>> 16);
     }
 
-    public virtual int Size() => _size;
-
-    public bool IsEmpty() => _size == 0;
-
     private int GetBucketIdx(int hash) => (_buckets.Length - 1) & hash;
 
     private Entry? GetBucket(int hash) => _buckets[GetBucketIdx(hash)];
@@ -70,25 +66,6 @@ internal class Dictionary<TK, TV> where TK : class, ICustomHash
 
         return default;
     }
-
-    public bool ContainsKey(TK key)
-    {
-        int hash = CalculateHash(key);
-        Entry? e = GetBucket(hash);
-
-        while (e != null)
-        {
-            if (e.Match(hash, key))
-            {
-                return true;
-            }
-
-            e = e.Next;
-        }
-
-        return false;
-    }
-
     public void AtPut(TK key, TV value)
     {
         int hash = CalculateHash(key);
@@ -240,21 +217,5 @@ internal class Dictionary<TK, TV> where TK : class, ICustomHash
         }
 
         return keys;
-    }
-
-    public Vector<TV> GetValues()
-    {
-        Vector<TV> values = new(_size);
-        foreach (Entry? c in _buckets)
-        {
-            Entry? current = c;
-            while (current != null)
-            {
-                values.Append(current.Value);
-                current = current.Next;
-            }
-        }
-
-        return values;
     }
 }
