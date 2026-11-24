@@ -20,6 +20,7 @@ jobs:
           - { name: Lua, id: lua, folder: Lua }
           - { name: Python, id: python, folder: Python }
           - { name: C++, id: cpp, folder: C++ }
+          - { name: Go, id: go, folder: Go }
 
     name: ${{ matrix.name }}
     steps:
@@ -51,6 +52,13 @@ jobs:
       - name: Install Crystal
         if: matrix.id == 'crystal'
         uses: oprypin/install-crystal@v1
+
+      - name: Install Go
+        if: matrix.id == 'go'
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: benchmarks/Go/go.mod
+          cache: false
 
       - name: Install JS
         if: matrix.id == 'js'
