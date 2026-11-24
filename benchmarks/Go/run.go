@@ -27,6 +27,8 @@ func getSuiteFromName(name string) func() Benchmark {
 	switch name {
 	case "Bounce":
 		return func() Benchmark { return &Bounce{} }
+	case "List":
+		return func() Benchmark { return &List{} }
 	default:
 		panic("No benchmark found with the name: " + name)
 	}
