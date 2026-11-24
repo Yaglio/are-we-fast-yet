@@ -29,6 +29,8 @@ func getSuiteFromName(name string) func() Benchmark {
 		return func() Benchmark { return &Bounce{} }
 	case "DeltaBlue":
 		return func() Benchmark { return &DeltaBlue{} }
+	case "Havlak":
+		return func() Benchmark { return &Havlak{} }
 	case "Json":
 		return func() Benchmark { return &Json{} }
 	case "List":
