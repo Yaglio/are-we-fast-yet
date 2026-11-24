@@ -35,6 +35,8 @@ func getSuiteFromName(name string) func() Benchmark {
 		return func() Benchmark { return &NBody{} }
 	case "Queens":
 		return func() Benchmark { return &Queens{} }
+	case "Sieve":
+		return func() Benchmark { return &Sieve{} }
 	default:
 		panic("No benchmark found with the name: " + name)
 	}
