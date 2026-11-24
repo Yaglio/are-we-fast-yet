@@ -37,6 +37,8 @@ func getSuiteFromName(name string) func() Benchmark {
 		return func() Benchmark { return &Mandelbrot{} }
 	case "NBody":
 		return func() Benchmark { return &NBody{} }
+	case "Permute":
+		return func() Benchmark { return &Permute{} }
 	case "Queens":
 		return func() Benchmark { return &Queens{} }
 	case "Richards":
