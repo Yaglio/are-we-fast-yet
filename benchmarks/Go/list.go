@@ -12,8 +12,9 @@ func newElement(v any) *element {
 func (e *element) length() int {
 	if e.next == nil {
 		return 1
+	} else {
+		return 1 + e.next.length()
 	}
-	return 1 + e.next.length()
 }
 
 // List exercises recursion over singly linked lists.
@@ -28,10 +29,11 @@ func (l *List) Benchmark() any {
 func (l *List) makeList(length int) *element {
 	if length == 0 {
 		return nil
+	} else {
+		e := newElement(length)
+		e.next = l.makeList(length - 1)
+		return e
 	}
-	e := newElement(length)
-	e.next = l.makeList(length - 1)
-	return e
 }
 
 func (l *List) isShorterThan(x, y *element) bool {
@@ -53,8 +55,9 @@ func (l *List) tail(x, y, z *element) *element {
 		return l.tail(l.tail(x.next, y, z),
 			l.tail(y.next, z, x),
 			l.tail(z.next, x, y))
+	} else {
+		return z
 	}
-	return z
 }
 
 // VerifyResult checks the benchmark result.

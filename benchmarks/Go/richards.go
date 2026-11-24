@@ -17,14 +17,14 @@ func (*Richards) VerifyResult(r any) bool {
 
 // Java RBObject constants (ADR-012). NO_WORK / NO_TASK are written as nil (ADR-026).
 const (
-	idler    int = 0
-	worker   int = 1
-	handlerA int = 2
-	handlerB int = 3
-	deviceA  int = 4
-	deviceB  int = 5
-	numTypes int = 6
-	tracing      = false // Scheduler.TRACING
+	idler    int  = 0
+	worker   int  = 1
+	handlerA int  = 2
+	handlerB int  = 3
+	deviceA  int  = 4
+	deviceB  int  = 5
+	numTypes int  = 6
+	tracing  bool = false // Scheduler.TRACING
 
 	devicePacketKind int = 0
 	workPacketKind   int = 1

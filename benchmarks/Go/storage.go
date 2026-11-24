@@ -22,12 +22,13 @@ func (s *Storage) buildTreeDepth(depth int, random *som.Random) arrayTree {
 	s.count++
 	if depth == 1 {
 		return make(arrayTree, random.Next()%10+1)
+	} else {
+		arr := make(arrayTree, 4)
+		for i := range arr {
+			arr[i] = s.buildTreeDepth(depth-1, random)
+		}
+		return arr
 	}
-	arr := make(arrayTree, 4)
-	for i := range arr {
-		arr[i] = s.buildTreeDepth(depth-1, random)
-	}
-	return arr
 }
 
 // VerifyResult checks the benchmark result.
