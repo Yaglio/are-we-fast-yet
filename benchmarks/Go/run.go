@@ -27,6 +27,8 @@ func getSuiteFromName(name string) func() Benchmark {
 	switch name {
 	case "Bounce":
 		return func() Benchmark { return &Bounce{} }
+	case "CD":
+		return func() Benchmark { return &CD{} }
 	case "DeltaBlue":
 		return func() Benchmark { return &DeltaBlue{} }
 	case "Havlak":
