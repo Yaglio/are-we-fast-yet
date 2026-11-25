@@ -1,7 +1,7 @@
 /* The Computer Language Benchmarks Game
  * http://shootout.alioth.debian.org/
  *
- * Based on nbody.java and adapted basde on the SOM version.
+ * Based on nbody.java and adapted based on the SOM version.
  */
 package nbody;
 
