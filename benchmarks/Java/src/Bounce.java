@@ -59,7 +59,7 @@ public final class Bounce extends Benchmark {
   public Object benchmark() {
     Random random = new Random();
 
-    int ballCount = 100;
+    final int ballCount = 100;
     int bounces   = 0;
     Ball[] balls  = new Ball[ballCount];
 
