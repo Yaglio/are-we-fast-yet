@@ -18,7 +18,7 @@ csharp_style_namespace_declarations = file_scoped:suggestion
 # ==========================================
 
 # --- Interfaces must start with 'I' ---
-dotnet_naming_rule.interface_rule.severity = suggestion
+dotnet_naming_rule.interface_rule.severity = error
 dotnet_naming_rule.interface_rule.symbols = interface_symbols
 dotnet_naming_rule.interface_rule.style = i_prefix_style
 dotnet_naming_symbols.interface_symbols.applicable_kinds = interface
@@ -26,14 +26,14 @@ dotnet_naming_style.i_prefix_style.required_prefix = I
 dotnet_naming_style.i_prefix_style.capitalization = pascal_case
 
 # --- Types and Methods must be PascalCase ---
-dotnet_naming_rule.types_and_methods_rule.severity = suggestion
+dotnet_naming_rule.types_and_methods_rule.severity = error
 dotnet_naming_rule.types_and_methods_rule.symbols = types_and_methods_symbols
 dotnet_naming_rule.types_and_methods_rule.style = pascal_case_style
 dotnet_naming_symbols.types_and_methods_symbols.applicable_kinds = class, struct, enum, method, property, event
 dotnet_naming_style.pascal_case_style.capitalization = pascal_case
 
 # --- Private fields must be _camelCase ---
-dotnet_naming_rule.private_fields_rule.severity = suggestion
+dotnet_naming_rule.private_fields_rule.severity = error
 dotnet_naming_rule.private_fields_rule.symbols = private_fields_symbols
 dotnet_naming_rule.private_fields_rule.style = underscore_camel_case_style
 dotnet_naming_symbols.private_fields_symbols.applicable_kinds = field
@@ -42,14 +42,14 @@ dotnet_naming_style.underscore_camel_case_style.required_prefix = _
 dotnet_naming_style.underscore_camel_case_style.capitalization = camel_case
 
 # --- Locals and Parameters must be camelCase ---
-dotnet_naming_rule.locals_and_parameters_rule.severity = suggestion
+dotnet_naming_rule.locals_and_parameters_rule.severity = error
 dotnet_naming_rule.locals_and_parameters_rule.symbols = locals_and_parameters_symbols
 dotnet_naming_rule.locals_and_parameters_rule.style = camel_case_style
 dotnet_naming_symbols.locals_and_parameters_symbols.applicable_kinds = local, parameter
 dotnet_naming_style.camel_case_style.capitalization = camel_case
 
 # --- Constants must be PascalCase ---
-dotnet_naming_rule.constant_rule.severity = suggestion
+dotnet_naming_rule.constant_rule.severity = error
 dotnet_naming_rule.constant_rule.symbols = constant_symbols
 dotnet_naming_rule.constant_rule.style = pascal_case_style
 dotnet_naming_symbols.constant_symbols.applicable_kinds = field, local
