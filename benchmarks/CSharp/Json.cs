@@ -92,24 +92,16 @@ internal sealed class JsonArray : JsonValue
   public override JsonArray AsArray() => this;
 }
 
-internal sealed class JsonLiteral : JsonValue
+internal sealed class JsonLiteral(string value) : JsonValue
 {
   public static readonly JsonValue Null = new JsonLiteral("null");
   public static readonly JsonValue True = new JsonLiteral("true");
   public static readonly JsonValue False = new JsonLiteral("false");
 
-  private readonly string _value;
-  private readonly bool _isNull;
-  private readonly bool _isTrue;
-  private readonly bool _isFalse;
-
-  public JsonLiteral(string value)
-  {
-    _value = value;
-    _isNull = value == "null";
-    _isTrue = value == "true";
-    _isFalse = value == "false";
-  }
+  private readonly string _value = value;
+  private readonly bool _isNull = value == "null";
+  private readonly bool _isTrue = value == "true";
+  private readonly bool _isFalse = value == "false";
 
   public override string ToString() => _value;
 
@@ -289,26 +281,15 @@ internal sealed class JsonObject : JsonValue
   }
 }
 
-internal sealed class JsonPureStringParser
+internal sealed class JsonPureStringParser(string str)
 {
-  private readonly string _input;
-  private int _index;
-  private int _line;
+  private readonly string _input = str;
+  private int _index = -1;
+  private int _line = 1;
   private int _column;
   private string? _current;
-  private string _captureBuffer;
-  private int _captureStart;
-
-  public JsonPureStringParser(string str)
-  {
-    _input = str;
-    _index = -1;
-    _line = 1;
-    _captureStart = -1;
-    _column = 0;
-    _current = null;
-    _captureBuffer = "";
-  }
+  private string _captureBuffer = "";
+  private int _captureStart = -1;
 
   public JsonValue Parse()
   {
@@ -690,14 +671,9 @@ internal sealed class JsonPureStringParser
   private bool IsEndOfText() => _current == null;
 }
 
-internal sealed class JsonString : JsonValue
+internal sealed class JsonString(string str) : JsonValue
 {
-  private readonly string _str;
-
-  public JsonString(string str)
-  {
-    _str = str;
-  }
+  private readonly string _str = str;
 
   public override bool IsString() => true;
 }
@@ -798,16 +774,9 @@ internal abstract class JsonValue
   public virtual JsonArray AsArray() => throw new InvalidOperationException($"Not an array: {ToString()}");
 }
 
-internal class ParseException : Exception
+internal class ParseException(string message, int offset, int line, int column) : Exception($"{message} at {line}:{column}")
 {
-  public int Offset { get; }
-  public int Line { get; }
-  public int Column { get; }
-
-  public ParseException(string message, int offset, int line, int column) : base($"{message} at {line}:{column}")
-  {
-    Offset = offset;
-    Line = line;
-    Column = column;
-  }
+  public int Offset { get; } = offset;
+  public int Line { get; } = line;
+  public int Column { get; } = column;
 }

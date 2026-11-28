@@ -21,14 +21,9 @@ internal sealed class DeltaBlue : Benchmark
 // a strength instance variable; concrete subclasses provide a means
 // of storing the constrained variables and other information required
 // to represent a constraint.
-internal abstract class AbstractConstraint
+internal abstract class AbstractConstraint(Strength.Sym strength)
 {
-  public Strength Strength { get; } // the strength of this constraint
-
-  protected AbstractConstraint(Strength.Sym strength)
-  {
-    Strength = Strength.Of(strength);
-  }
+  public Strength Strength { get; } = Strength.Of(strength); // the strength of this constraint
 
   // Normal constraints are not input constraints. An input constraint
   // is one that depends on external state, such as the mouse, the
@@ -146,18 +141,14 @@ internal abstract class AbstractConstraint
 
 // I am an abstract superclass for constraints having two possible
 // output variables.
-internal abstract class BinaryConstraint : AbstractConstraint
+#pragma warning disable CS9113
+internal abstract class BinaryConstraint(Variable var1, Variable var2, Strength.Sym strength, Planner planner) : AbstractConstraint(strength)
 {
-  protected Variable? V1;
-  protected Variable? V2; // possible output variables
-  protected Direction? CurrentDirection; // one of the following...
+#pragma warning restore CS9113
 
-  protected BinaryConstraint(Variable var1, Variable var2, Strength.Sym strength, Planner planner) : base(strength)
-  {
-    V1 = var1;
-    V2 = var2;
-    CurrentDirection = null;
-  }
+  protected Variable? V1 = var1;
+  protected Variable? V2 = var2; // possible output variables
+  protected Direction? CurrentDirection; // one of the following...
 
   // Answer true if this constraint is satisfied in the current solution.
   public override bool IsSatisfied() => CurrentDirection != null;
@@ -287,12 +278,8 @@ internal enum Direction
 
 // I am a unary input constraint used to mark a variable that the
 // client wishes to change.
-internal sealed class EditConstraint : UnaryConstraint
+internal sealed class EditConstraint(Variable v, Strength.Sym strength, Planner planner) : UnaryConstraint(v, strength, planner)
 {
-  public EditConstraint(Variable v, Strength.Sym strength, Planner planner) : base(v, strength, planner)
-  {
-  }
-
   // I indicate that a variable is to be changed by imperative code.
   public override bool IsInput() => true;
 
@@ -329,12 +316,8 @@ internal sealed class EqualityConstraint : BinaryConstraint
 // A Plan is an ordered list of constraints to be executed in sequence
 // to resatisfy all currently satisfiable constraints in the face of
 // one or more changing inputs.
-internal sealed class Plan : Vector<AbstractConstraint>
+internal sealed class Plan() : Vector<AbstractConstraint>(15)
 {
-  public Plan() : base(15)
-  {
-  }
-
   public void Execute()
   {
     ForEach(c => c.Execute());
@@ -781,12 +764,9 @@ internal sealed class ScaleConstraint : BinaryConstraint
 // satisfied, my output will not change during plan execution. This is
 // called "stay optimization".
 //
-internal sealed class StayConstraint : UnaryConstraint
+internal sealed class StayConstraint(Variable v, Strength.Sym strength, Planner planner) : UnaryConstraint(v, strength, planner)
 {
   // Install a stay constraint with the given strength on the given variable.
-  public StayConstraint(Variable v, Strength.Sym strength, Planner planner) : base(v, strength, planner)
-  {
-  }
 
   public override void Execute()
   {
@@ -801,14 +781,9 @@ internal sealed class StayConstraint : UnaryConstraint
  */
 internal sealed class Strength
 {
-  internal sealed class Sym : ICustomHash
+  internal sealed class Sym(int hash) : ICustomHash
   {
-    private readonly int _hash;
-
-    public Sym(int hash)
-    {
-      _hash = hash;
-    }
+    private readonly int _hash = hash;
 
     public int CustomHash()
     {

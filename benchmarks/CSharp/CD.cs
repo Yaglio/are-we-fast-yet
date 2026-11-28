@@ -71,26 +71,15 @@ internal sealed class CD : Benchmark
   public override bool VerifyResult(object result) => throw new InvalidOperationException("VerifyResult(object) should not be called for CD benchmark.");
 }
 
-internal sealed class Aircraft
+internal sealed class Aircraft(CallSign callSign, Vector3D position)
 {
-  public readonly CallSign CallSign;
-  public readonly Vector3D Position;
-
-  public Aircraft(CallSign callSign, Vector3D position)
-  {
-    CallSign = callSign;
-    Position = position;
-  }
+  public readonly CallSign CallSign = callSign;
+  public readonly Vector3D Position = position;
 }
 
-internal class CallSign : IComparable<CallSign>
+internal class CallSign(int value) : IComparable<CallSign>
 {
-  private readonly int _value;
-
-  public CallSign(int value)
-  {
-    _value = value;
-  }
+  private readonly int _value = value;
 
   public int CompareTo(CallSign? other)
   {
@@ -103,18 +92,11 @@ internal class CallSign : IComparable<CallSign>
   }
 }
 
-internal sealed class Collision
+internal sealed class Collision(CallSign aircraftA, CallSign aircraftB, Vector3D position)
 {
-  public readonly CallSign AircraftA;
-  public readonly CallSign AircraftB;
-  public readonly Vector3D Position;
-
-  public Collision(CallSign aircraftA, CallSign aircraftB, Vector3D position)
-  {
-    AircraftA = aircraftA;
-    AircraftB = aircraftB;
-    Position = position;
-  }
+  public readonly CallSign AircraftA = aircraftA;
+  public readonly CallSign AircraftB = aircraftB;
+  public readonly Vector3D Position = position;
 }
 
 internal sealed class CollisionDetector
@@ -326,18 +308,11 @@ internal sealed class Constants
   public const double GoodVoxelSize = ProximityRadius * 2.0;
 }
 
-internal sealed class Motion
+internal sealed class Motion(CallSign callSign, Vector3D posOne, Vector3D posTwo)
 {
-  public readonly CallSign CallSign;
-  public readonly Vector3D PosOne;
-  public readonly Vector3D PosTwo;
-
-  public Motion(CallSign callSign, Vector3D posOne, Vector3D posTwo)
-  {
-    CallSign = callSign;
-    PosOne = posOne;
-    PosTwo = posTwo;
-  }
+  public readonly CallSign CallSign = callSign;
+  public readonly Vector3D PosOne = posOne;
+  public readonly Vector3D PosTwo = posTwo;
 
   private Vector3D Delta() => PosTwo.Minus(PosOne);
 
@@ -457,24 +432,14 @@ internal sealed class RedBlackTree<TK, TV> where TK : IComparable<TK>
     return current;
   }
 
-  private sealed class Node
+  private sealed class Node(TK key, TV value)
   {
-    public readonly TK Key;
-    public TV Value;
+    public readonly TK Key = key;
+    public TV Value = value;
     public Node? Left;
     public Node? Right;
     public Node? Parent;
-    public Color Color;
-
-    public Node(TK key, TV value)
-    {
-      Key = key;
-      Value = value;
-      Left = null;
-      Right = null;
-      Parent = null;
-      Color = Color.Red;
-    }
+    public Color Color = Color.Red;
 
     public Node? Successor()
     {
@@ -664,16 +629,10 @@ internal sealed class RedBlackTree<TK, TV> where TK : IComparable<TK>
     return node == null ? default : node.Value;
   }
 
-  internal sealed class Entry
+  internal sealed class Entry(TK key, TV value)
   {
-    public readonly TK Key;
-    public readonly TV Value;
-
-    public Entry(TK key, TV value)
-    {
-      Key = key;
-      Value = value;
-    }
+    public readonly TK Key = key;
+    public readonly TV Value = value;
   }
 
   public void ForEach(Action<Entry> fn)
@@ -708,18 +667,11 @@ internal sealed class RedBlackTree<TK, TV> where TK : IComparable<TK>
     return null;
   }
 
-  private sealed class InsertResult
+  private sealed class InsertResult(bool isNewEntry, Node? newNode, TV? oldValue)
   {
-    public readonly bool IsNewEntry;
-    public readonly Node? NewNode;
-    public readonly TV? OldValue;
-
-    public InsertResult(bool isNewEntry, Node? newNode, TV? oldValue)
-    {
-      IsNewEntry = isNewEntry;
-      NewNode = newNode;
-      OldValue = oldValue;
-    }
+    public readonly bool IsNewEntry = isNewEntry;
+    public readonly Node? NewNode = newNode;
+    public readonly TV? OldValue = oldValue;
   }
 
   private InsertResult TreeInsert(TK key, TV value)
@@ -956,16 +908,10 @@ internal sealed class Simulator
   }
 }
 
-internal sealed class Vector2D : IComparable<Vector2D>
+internal sealed class Vector2D(double x, double y) : IComparable<Vector2D>
 {
-  public readonly double X;
-  public readonly double Y;
-
-  public Vector2D(double x, double y)
-  {
-    X = x;
-    Y = y;
-  }
+  public readonly double X = x;
+  public readonly double Y = y;
 
   public Vector2D Plus(Vector2D other) => new(X + other.X, Y + other.Y);
 
@@ -1009,18 +955,11 @@ internal sealed class Vector2D : IComparable<Vector2D>
   }
 }
 
-internal sealed class Vector3D
+internal sealed class Vector3D(double x, double y, double z)
 {
-  public readonly double X;
-  public readonly double Y;
-  public readonly double Z;
-
-  public Vector3D(double x, double y, double z)
-  {
-    X = x;
-    Y = y;
-    Z = z;
-  }
+  public readonly double X = x;
+  public readonly double Y = y;
+  public readonly double Z = z;
 
   public Vector3D Plus(Vector3D other) => new(X + other.X, Y + other.Y, Z + other.Z);
 

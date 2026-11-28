@@ -2,21 +2,13 @@ using System.Diagnostics;
 
 namespace Benchmarks;
 
-internal sealed class Run
+internal sealed class Run(string name)
 {
-  private int _iterations;
-  private int _innerIterations;
+  private int _iterations = 1;
+  private int _innerIterations = 1;
   private long _total;
-  private readonly string _name;
-  private readonly Func<Benchmark> _benchmarkSuite;
-
-  public Run(string name)
-  {
-    _name = name;
-    _benchmarkSuite = GetSuiteFromName(name);
-    _iterations = 1;
-    _innerIterations = 1;
-  }
+  private readonly string _name = name;
+  private readonly Func<Benchmark> _benchmarkSuite = GetSuiteFromName(name);
 
   private static Func<Benchmark> GetSuiteFromName(string name)
   {

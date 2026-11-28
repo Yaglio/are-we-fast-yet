@@ -146,3 +146,10 @@ resharper_tail_recursive_call_highlighting = none
 resharper_suggest_var_or_type_built_in_types_highlighting = none
 resharper_suggest_var_or_type_simple_types_highlighting = none
 resharper_suggest_var_or_type_elsewhere_highlighting = none
+
+# Enforce use of primary constructors
+dotnet_diagnostic.IDE0290.severity = error
+resharper_convert_to_primary_constructor_highlighting = error
+
+# TODO: Possibly reenable these rules
+resharper_member_can_be_protected_global_highlighting = none

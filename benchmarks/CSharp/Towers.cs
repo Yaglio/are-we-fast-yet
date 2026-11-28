@@ -2,15 +2,10 @@ namespace Benchmarks;
 
 internal sealed class Towers : Benchmark
 {
-  private sealed class TowersDisk
+  private sealed class TowersDisk(int size)
   {
-    public int Size { get; }
+    public int Size { get; } = size;
     public TowersDisk? Next { get; set; }
-
-    public TowersDisk(int size)
-    {
-      Size = size;
-    }
   }
 
   private TowersDisk?[] _piles = null!;

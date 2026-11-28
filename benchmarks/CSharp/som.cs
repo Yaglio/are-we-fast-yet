@@ -259,18 +259,9 @@ internal class Vector<TE>
   private void DefaultSort(int i, int j) => throw new NotImplementedException();
 }
 
-internal class Set<TE>
+internal class Set<TE>(int size = CollectionConstants.InitialSize)
 {
-  private readonly Vector<TE> _items;
-
-  public Set() : this(CollectionConstants.InitialSize)
-  {
-  }
-
-  public Set(int size)
-  {
-    _items = new Vector<TE>(size);
-  }
+  private readonly Vector<TE> _items = new(size);
 
   public int Size() => _items.Size();
 
@@ -319,38 +310,21 @@ internal interface ICustomHash
   int CustomHash();
 }
 
-internal class Dictionary<TK, TV> where TK : class, ICustomHash
+internal class Dictionary<TK, TV>(int size = Dictionary<TK, TV>.InitialCapacity) where TK : class, ICustomHash
 {
   protected const int InitialCapacity = 16;
 
-  private Entry?[] _buckets;
+  private Entry?[] _buckets = new Entry[size];
   private int _size;
 
-  protected class Entry
+  protected class Entry(int hash, TK key, TV value, Entry? next)
   {
-    public readonly int Hash;
-    public readonly TK Key;
-    public TV Value;
-    public Entry? Next;
-
-    public Entry(int hash, TK key, TV value, Entry? next)
-    {
-      Hash = hash;
-      Key = key;
-      Value = value;
-      Next = next;
-    }
+    public readonly int Hash = hash;
+    public readonly TK Key = key;
+    public TV Value = value;
+    public Entry? Next = next;
 
     public virtual bool Match(int hash, TK key) => Hash == hash && key.Equals(Key);
-  }
-
-  public Dictionary(int size)
-  {
-    _buckets = new Entry[size];
-  }
-
-  public Dictionary() : this(InitialCapacity)
-  {
   }
 
   private static int CalculateHash(TK? key)
@@ -578,23 +552,11 @@ internal class Dictionary<TK, TV> where TK : class, ICustomHash
   }
 }
 
-internal class IdentityDictionary<TK, TV> : Dictionary<TK, TV> where TK : class, ICustomHash
+internal sealed class IdentityDictionary<TK, TV>(int size = Dictionary<TK, TV>.InitialCapacity) : Dictionary<TK, TV>(size) where TK : class, ICustomHash
 {
-  private sealed class IdEntry : Entry
+  private sealed class IdEntry(int hash, TK key, TV value, Entry? next) : Entry(hash, key, value, next)
   {
-    public IdEntry(int hash, TK key, TV value, Entry? next) : base(hash, key, value, next)
-    {
-    }
-
     public override bool Match(int hash, TK key) => Hash == hash && Key == key;
-  }
-
-  public IdentityDictionary(int size) : base(size)
-  {
-  }
-
-  public IdentityDictionary() : base(InitialCapacity)
-  {
   }
 
   protected override Entry NewEntry(TK key, TV value, int hash) => new IdEntry(hash, key, value, null);
@@ -611,14 +573,8 @@ internal class Random
   }
 }
 
-internal sealed class Pair<TK, TV>
+internal sealed class Pair<TK, TV>(TK key, TV value)
 {
-  public TK Key { get; set; }
-  private TV Value { get; set; }
-
-  public Pair(TK key, TV value)
-  {
-    Key = key;
-    Value = value;
-  }
+  public TK Key { get; set; } = key;
+  private TV Value { get; set; } = value;
 }

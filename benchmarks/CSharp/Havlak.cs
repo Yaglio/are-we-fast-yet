@@ -43,19 +43,12 @@ internal class Havlak : Benchmark
   public override bool VerifyResult(object result) => throw new InvalidOperationException("VerifyResult(object) should not be called for Havlak benchmark.");
 }
 
-internal sealed class BasicBlock : ICustomHash
+internal sealed class BasicBlock(int name) : ICustomHash
 {
-  public Vector<BasicBlock> InEdges { get; }
-  public Vector<BasicBlock> OutEdges { get; }
+  public Vector<BasicBlock> InEdges { get; } = new(2);
+  public Vector<BasicBlock> OutEdges { get; } = new(2);
 
-  private readonly int _name;
-
-  public BasicBlock(int name)
-  {
-    _name = name;
-    InEdges = new Vector<BasicBlock>(2);
-    OutEdges = new Vector<BasicBlock>(2);
-  }
+  private readonly int _name = name;
 
   public int GetNumPred() => InEdges.Size();
 
@@ -119,10 +112,10 @@ internal sealed class ControlFlowGraph
   public BasicBlock? GetStartBasicBlock() => _startNode;
 }
 
-internal sealed class HavlakLoopFinder
+internal sealed class HavlakLoopFinder(ControlFlowGraph cfg, LoopStructureGraph lsg)
 {
-  private readonly ControlFlowGraph _cfg; // Control Flow Graph
-  private readonly LoopStructureGraph _lsg; // Loop Structure Graph
+  private readonly ControlFlowGraph _cfg = cfg; // Control Flow Graph
+  private readonly LoopStructureGraph _lsg = lsg; // Loop Structure Graph
 
   // Marker for uninitialized nodes.
   private const int Unvisited = int.MaxValue;
@@ -138,12 +131,6 @@ internal sealed class HavlakLoopFinder
   private BasicBlockClass[]? _type;
   private int[]? _last;
   private UnionFindNode[]? _nodes;
-
-  public HavlakLoopFinder(ControlFlowGraph cfg, LoopStructureGraph lsg)
-  {
-    _cfg = cfg;
-    _lsg = lsg;
-  }
 
   // Basic Blocks and Loops are being classified as regular, irreducible,
   // and so on. This enum contains a symbolic name for all these

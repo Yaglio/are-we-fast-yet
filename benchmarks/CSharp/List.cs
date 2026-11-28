@@ -2,16 +2,11 @@ namespace Benchmarks;
 
 internal sealed class List : Benchmark
 {
-  private sealed class Element
+  private sealed class Element(object v)
   {
-    public object Val { get; set; }
+    public object Val { get; set; } = v;
 
     public Element? Next { get; set; }
-
-    public Element(object v)
-    {
-      Val = v;
-    }
 
     public int Length()
     {

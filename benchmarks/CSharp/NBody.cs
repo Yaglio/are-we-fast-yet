@@ -37,30 +37,19 @@ internal sealed class NBody : Benchmark
   public override bool VerifyResult(object result) => throw new InvalidOperationException("VerifyResult(object) should not be called for NBody benchmark.");
 }
 
-internal sealed class Body
+internal sealed class Body(double x, double y, double z, double vx, double vy, double vz, double mass)
 {
   private const double Pi = 3.141592653589793;
   private const double SolarMass = 4 * Pi * Pi;
   private const double DaysPerYer = 365.24;
 
-  public Body(double x, double y, double z, double vx, double vy, double vz, double mass)
-  {
-    X = x;
-    Y = y;
-    Z = z;
-    Vx = vx * DaysPerYer;
-    Vy = vy * DaysPerYer;
-    Vz = vz * DaysPerYer;
-    Mass = mass * SolarMass;
-  }
-
-  public double X { get; set; }
-  public double Y { get; set; }
-  public double Z { get; set; }
-  public double Vx { get; set; }
-  public double Vy { get; set; }
-  public double Vz { get; set; }
-  public double Mass { get; }
+  public double X { get; set; } = x;
+  public double Y { get; set; } = y;
+  public double Z { get; set; } = z;
+  public double Vx { get; set; } = vx * DaysPerYer;
+  public double Vy { get; set; } = vy * DaysPerYer;
+  public double Vz { get; set; } = vz * DaysPerYer;
+  public double Mass { get; } = mass * SolarMass;
 
   public static Body Jupiter => new(
       4.84143144246472090e+00,

@@ -46,28 +46,19 @@ internal sealed class IdleTaskDataRecord : RbObject
   }
 }
 
-internal sealed class Packet : RbObject
+internal sealed class Packet(Packet? link, int identity, int kind) : RbObject
 {
   public const int DataSize = 4;
 
-  public Packet(Packet? link, int identity, int kind)
-  {
-    Link = link;
-    Identity = identity;
-    Kind = kind;
-    Datum = 0;
-    Data = new int[DataSize];
-  }
-
-  public int[] Data { get; }
+  public int[] Data { get; } = new int[DataSize];
 
   public int Datum { get; set; }
 
-  public int Identity { get; set; }
+  public int Identity { get; set; } = identity;
 
-  public int Kind { get; }
+  public int Kind { get; } = kind;
 
-  public Packet? Link { get; set; }
+  public Packet? Link { get; set; } = link;
 
   public override string ToString() => $"Packet id: {Identity} kind: {Kind}";
 }

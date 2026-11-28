@@ -2,20 +2,12 @@ namespace Benchmarks;
 
 internal sealed class Bounce : Benchmark
 {
-  private sealed class Ball
+  private sealed class Ball(Random random)
   {
-    private int _x;
-    private int _y;
-    private int _xVel;
-    private int _yVel;
-
-    public Ball(Random random)
-    {
-      _x = random.Next() % 500;
-      _y = random.Next() % 500;
-      _xVel = random.Next() % 300 - 150;
-      _yVel = random.Next() % 300 - 150;
-    }
+    private int _x = random.Next() % 500;
+    private int _y = random.Next() % 500;
+    private int _xVel = random.Next() % 300 - 150;
+    private int _yVel = random.Next() % 300 - 150;
 
     public bool Bounce()
     {
