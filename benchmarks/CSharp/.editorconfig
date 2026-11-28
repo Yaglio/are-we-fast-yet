@@ -67,9 +67,9 @@ dotnet_diagnostic.IDE0044.severity = suggestion
 resharper_field_can_be_made_read_only_global_highlighting = suggestion
 resharper_field_can_be_made_read_only_local_highlighting = suggestion
 
-# Suggest sealed for internal classes
-dotnet_diagnostic.CA1852.severity = suggestion
-resharper_class_can_be_sealed_global_highlighting = suggestion
+# Require sealed for internal classes
+dotnet_diagnostic.CA1852.severity = error
+resharper_class_can_be_sealed_global_highlighting = error
 
 
 # ==========================================
@@ -153,3 +153,16 @@ resharper_convert_to_primary_constructor_highlighting = error
 
 # TODO: Possibly reenable these rules
 resharper_member_can_be_protected_global_highlighting = none
+resharper_unused_member_global_highlighting = none
+resharper_unused_member_local_highlighting = none
+resharper_member_can_be_private_global_highlighting = none
+resharper_unused_method_return_value_global_highlighting = none
+resharper_unused_method_return_value_local_highlighting = none
+resharper_unused_parameter_global_highlighting = none
+resharper_unused_parameter_local_highlighting = none
+resharper_unused_type_global_highlighting = none
+resharper_unused_type_local_highlighting = none
+resharper_replace_with_primary_constructor_parameter_highlighting = none
+resharper_not_accessed_field_local_highlighting = none
+resharper_unused_auto_property_accessor_global_highlighting = none
+resharper_unused_auto_property_accessor_local_highlighting = none

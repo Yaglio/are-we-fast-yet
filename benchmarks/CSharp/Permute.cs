@@ -1,6 +1,6 @@
 namespace Benchmarks;
 
-internal class Permute : Benchmark
+internal sealed class Permute : Benchmark
 {
   private int _count;
   private int[] _v = null!;

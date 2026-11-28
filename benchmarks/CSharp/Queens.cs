@@ -1,6 +1,6 @@
 namespace Benchmarks;
 
-internal class Queens : Benchmark
+internal sealed class Queens : Benchmark
 {
   private bool[] _freeMaxs = null!;
   private bool[] _freeRows = null!;

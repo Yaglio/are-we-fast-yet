@@ -77,7 +77,7 @@ internal sealed class Aircraft(CallSign callSign, Vector3D position)
   public readonly Vector3D Position = position;
 }
 
-internal class CallSign(int value) : IComparable<CallSign>
+internal sealed class CallSign(int value) : IComparable<CallSign>
 {
   private readonly int _value = value;
 
@@ -296,7 +296,7 @@ internal sealed class CollisionDetector
   }
 }
 
-internal sealed class Constants
+internal static class Constants
 {
   public const double MinX = 0.0;
   public const double MinY = 0.0;

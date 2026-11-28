@@ -1,6 +1,6 @@
 namespace Benchmarks;
 
-internal sealed class Harness
+public static class Harness
 {
   private static Run ProcessArguments(string[] args)
   {

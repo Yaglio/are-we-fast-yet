@@ -562,7 +562,7 @@ internal sealed class IdentityDictionary<TK, TV>(int size = Dictionary<TK, TV>.I
   protected override Entry NewEntry(TK key, TV value, int hash) => new IdEntry(hash, key, value, null);
 }
 
-internal class Random
+internal sealed class Random
 {
   private int _seed = 74755;
 

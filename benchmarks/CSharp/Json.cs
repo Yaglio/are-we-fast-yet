@@ -1,6 +1,6 @@
 namespace Benchmarks;
 
-internal class Json : Benchmark
+internal sealed class Json : Benchmark
 {
   public override object Execute() => new JsonPureStringParser(RapBenchmarkMinified).Parse();
 
@@ -774,7 +774,7 @@ internal abstract class JsonValue
   public virtual JsonArray AsArray() => throw new InvalidOperationException($"Not an array: {ToString()}");
 }
 
-internal class ParseException(string message, int offset, int line, int column) : Exception($"{message} at {line}:{column}")
+internal sealed class ParseException(string message, int offset, int line, int column) : Exception($"{message} at {line}:{column}")
 {
   public int Offset { get; } = offset;
   public int Line { get; } = line;

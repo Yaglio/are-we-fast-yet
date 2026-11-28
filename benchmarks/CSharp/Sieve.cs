@@ -1,6 +1,6 @@
 namespace Benchmarks;
 
-internal class Sieve : Benchmark
+internal sealed class Sieve : Benchmark
 {
   public override object Execute()
   {

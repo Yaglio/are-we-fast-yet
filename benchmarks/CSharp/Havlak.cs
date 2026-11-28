@@ -1,6 +1,6 @@
 namespace Benchmarks;
 
-internal class Havlak : Benchmark
+internal sealed class Havlak : Benchmark
 {
   public override bool InnerBenchmarkLoop(int innerIterations)
       => VerifyResult(new LoopTesterApp().Main(innerIterations, 50, 10, 10, 5), innerIterations);
