@@ -52,14 +52,13 @@ internal sealed class Run
 
   private void Measure(Benchmark bench)
   {
-    Stopwatch sw = new();
-    sw.Start();
+    long start = Stopwatch.GetTimestamp();
     if (!bench.InnerBenchmarkLoop(_innerIterations))
     {
       throw new InvalidOperationException("Benchmark failed with incorrect result");
     }
 
-    long runTime = (long)(sw.Elapsed.TotalMilliseconds * 1000);
+    long runTime = (long)(Stopwatch.GetElapsedTime(start).TotalMicroseconds);
     PrintResult(runTime);
     _total += runTime;
   }
